@@ -1,0 +1,14 @@
+# tgis file tells git what files or directories to ignore when committing changes to the repository.
+
+# Python's cache folder:
+__pycache__/
+
+# Compiled Python files:
+*.pyc
+
+# personal VS code settings:
+.vscode/
+
+# local Python environments:
+venv/
+
