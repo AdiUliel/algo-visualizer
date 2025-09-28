@@ -8,3 +8,4 @@ class Node:
         self.x = x
         self.y = y
         # x and y are parameters for visualization - where do we draw the node on the screen
+        self.tint = None     # (rgb - optional)

@@ -1,12 +1,17 @@
-from node import Node
-from infrastructure.edge import Edge
+from .node import Node
+from .edge import Edge
 
 class Graph:
-    def __init__(self):
-        self.nodes = {} # id -> Node
-        self.edges = [] # list of  Edge
+    def __init__(self, directed = False):
+        self.nodes = {}         # id -> Node
+        self.edges = []         # list of  Edge
+        self.directed = directed
+        self.fx = {}            # transient visual effects/state, e.g. {'cursor': (x,y), 'queue': [ids]}
+        self.speed_factor = 0.5
         
     def add_node(self, id, x, y):
+        if id in self.nodes:
+            raise ValueError(f"Node with id {id} already exists")
         node = Node(id, x, y)
         self.nodes[id] = node
         return node
@@ -21,5 +26,16 @@ class Graph:
         self.edges.append(edge)
         
         # updating adjacency
-        n1.neighbots.append(n2)
-        n2.neighbots.append(n1)
+        n1.neighbors.append(n2)
+        if not self.directed:
+            n2.neighbors.append(n1)
+            
+    def reset_states(self):
+        """
+        Reset all nodes to unvisited before BFS/DFS
+        """
+        for node in self.nodes.values():
+            node.state = "unvisited"
+            node.parent = None
+            node.tint = None     # <- clear any custom color
+        self.fx.clear()          # <- clear transient effects
