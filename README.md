@@ -2,7 +2,7 @@
 
 # Algorithm Visualizer
 An interactive tool for exploring algorithms visually.
-The visualizer allows you to easily build, edit, and traverse graphs - currently supports BFS,DFS amd Dijkstra algorithms.
+The visualizer allows you to easily build, edit, and traverse graphs. Currently supports BFS, DFS amd Dijkstra algorithms.
 This tool is implemented in Python (and Pygame).
 
 ## Features
