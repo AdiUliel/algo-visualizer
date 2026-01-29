@@ -1,51 +1,38 @@
 from collections import deque
-from .animation_helpers import animate, ease_out_cubic, lerp, lerp_color
+from .animation_helpers import animate, ease_out_cubic, lerp
 
 def bfs_steps(graph, start_id):
-    start = graph.nodes[start_id]
+    all_nodes = list(graph.nodes.values())
+    if start_id in graph.nodes:
+        start_node = graph.nodes[start_id]
+        all_nodes.remove(start_node)
+        all_nodes.insert(0, start_node)
 
-    q = deque([start])
-    graph.fx["queue"] = [start.id]
+    for root_node in all_nodes:
+        if root_node.state != "unvisited": continue
 
-    start.state = "visiting"
-    start_base = (180,180,180)
-    amber = (255,215,0)
-    def tint_start(p):
-        start.tint = lerp_color(start_base, amber, ease_out_cubic(p))
-    yield from animate(graph, 0.20, tint_start)
-    start.tint = None
-    yield
+        q = deque([root_node])
+        graph.fx["queue"] = [root_node.id]
+        root_node.state = "visiting"
+        yield from animate(graph, 0.60, lambda p: None) 
+        
+        while q:
+            u = q.popleft()
+            graph.fx["log"].append(u.id)
+            graph.fx["queue"] = [n.id for n in q]
 
-    while q:
-        u = q.popleft()
-        graph.fx["log"].append(u.id)
-        graph.fx["queue"] = [n.id for n in q]
+            for v in u.neighbors:
+                if v.state == "unvisited":
+                    graph.fx["cursor"] = (u.x, u.y)
+                    ux, uy, vx, vy = u.x, u.y, v.x, v.y
+                    yield from animate(graph, 0.80, lambda p: graph.fx.update({"cursor": (lerp(ux, vx, ease_out_cubic(p)), lerp(uy, vy, ease_out_cubic(p)))}))
+                    graph.fx.pop("cursor", None)
 
-        for v in u.neighbors:
-            if v.state == "unvisited":
-                graph.fx["cursor"] = (u.x, u.y)
-                ux, uy, vx, vy = u.x, u.y, v.x, v.y
-                def move(p):
-                    p2 = ease_out_cubic(p)
-                    graph.fx["cursor"] = (lerp(ux, vx, p2), lerp(uy, vy, p2))
-                yield from animate(graph, 0.30, move)
-                graph.fx.pop("cursor", None)
+                    v.state = "visiting"
+                    v.parent = u
+                    q.append(v)
+                    graph.fx["queue"] = [n.id for n in q]
+                    yield
 
-                v.state = "visiting"
-                def tint_v(p):
-                    v.tint = lerp_color((180,180,180), amber, ease_out_cubic(p))
-                yield from animate(graph, 0.15, tint_v)
-                v.tint = None
-
-                v.parent = u
-                q.append(v)
-                graph.fx["queue"] = [n.id for n in q]
-                yield
-
-        green = (120,200,120)
-        def finish_u(p):
-            u.tint = lerp_color(amber, green, ease_out_cubic(p))
-        yield from animate(graph, 0.20, finish_u)
-        u.state = "visited"
-        u.tint = None
-        yield
+            u.state = "visited"
+            yield from animate(graph, 0.40, lambda p: None)

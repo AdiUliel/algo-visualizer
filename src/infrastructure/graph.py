@@ -11,7 +11,7 @@ class Graph:
         
     def add_node(self, id, x, y):
         if id in self.nodes:
-            raise ValueError(f"Node with id {id} already exists")
+            return self.nodes[id]
         node = Node(id, x, y)
         self.nodes[id] = node
         return node

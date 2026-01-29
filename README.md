@@ -1,20 +1,18 @@
 <img width="1187" height="692" alt="_דיאגרמה ללא שם_ drawio (1)" src="https://github.com/user-attachments/assets/8dcc9778-5147-452a-a6ec-e54b05b23b07" />
 
 # Algorithm Visualizer
-A tool for exploring algorithms visually.
-Currently supports BFS and DFS.
-This tool is implemented in Python (specifically, Pygame).
+An interactive tool for exploring algorithms visually.
+The visualizer allows you to easily build, edit, and traverse graphs - currently supports BFS,DFS amd Dijkstra algorithms.
+This tool is implemented in Python (and Pygame).
 
 ## Features
-Step-by-step execution using generators (yield)
-Smooth animations for node discovery and traversal
-Visual indication of:
-Visited / visiting / unvisited nodes
-Active cursor on edges
-Queue (BFS) or Stack (DFS)
-Manual stepping or autoplay mode
-Load custom graphs from JSON files
-Simple UI for algorithm selection
+* Real-time Interaction:
+* Add/Delete Nodes: Build your graph from scratch on a blank canvas.
+* Dynamic Edging: Connect nodes and assign weights with simple mouse controls.
+* Traversal Animations.
+* In-depth Algorithm Tracking:
+    * Sidebar Data: Real-time view of the Queue, Stack, or Priority Queue.
+    * Visit Log: A historical log of the traversal sequence.
 
 ## Project Structure
 ```text
@@ -23,8 +21,9 @@ algo-visualizer/
 ├── requirements.txt
 ├── README.md
 └── src/
-    ├── main.py              # Pygame entry point
-    ├── app_controller.py    # Tkinter UI for algorithm selection
+    ├── main.py
+    ├── app_controller.py
+    |   # this file is not being used in the current version.
     │
     ├── infrastructure/      # Graph data structures
     │   ├── graph.py
@@ -34,43 +33,46 @@ algo-visualizer/
     ├── algorithms/          # Algorithm implementations
     │   ├── bfs.py
     │   ├── dfs.py
+    │   ├── dijkstra.py
     │   └── animation_helpers.py
     │
-    └── visualizer.py        # Rendering and drawing logic
+    └── visualizer.py        # Rendering, drawing and sidebar logic
 ```
 
 ## How to Run
 1. Clone the repo
+```text
+git clone https://github.com/<your-username>/algo-visualizer.git
+cd algo-visualizer
+```
 2. Install the requirements:
-    pip install -r requirements.txt
+```text
+pip install -r requirements.txt
+```
 3. Run it:
-    * Either with the algorithm picker for making more manual selections:
-        python -m src.app_controller
-    * Or, directly launch the visualizer with a demo graph:
-        python -m src.main
+```text
+python -m src.main
+```
+
 
 ## Controls
-    Key 	        Action
-    B   	        Start BFS
-    D	            Start DFS
-    Space           Execute one step
-    P	            Toggle autoplay
-    R   	        Reset graph state
-    ESC/Q	        Quit
 
-## Custom Graph
-You can load your own graph by filling the following JSON format.
-* Each node must include screen coordinates (x,y) in order to be visualized.
-```text
-{
-  "directed": false,
-  "nodes": [
-    { "id": 1, "x": 150, "y": 100 },
-    { "id": 2, "x": 300, "y": 200 }
-  ],
-  "edges": [
-    [1, 2],
-    [2, 3]
-  ]
-}
-```
+### Graph Editing
+| Key/Mouse | Action |
+| :--- | :--- |
+| **Left-Click** | Add a new Node |
+| **Right-Click** | Connect two nodes (select first, then second) |
+| **Double Right-Click** | Edit Edge weight (on the edge itself) |
+| **DEL / Backspace** | Delete the hovered node or edge |
+| **C** | **Clear Board**: Wipe all nodes and edges (requires confirmation) |
+
+### Algorithm Execution
+| Key | Action |
+| :--- | :--- |
+| **B** | Start **BFS** (Breadth-First Search) |
+| **D** | Start **DFS** (Depth-First Search) |
+| **K** | Start **Dijkstra's** Algorithm |
+| **Space** | Execute one step |
+| **P** | Toggle Autoplay |
+| **O** | **Stop**: Reset states and return to Editor Mode |
+| **ESC / Q** | Quit Application |

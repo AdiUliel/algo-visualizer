@@ -1,56 +1,48 @@
 from .animation_helpers import animate, ease_out_cubic, lerp, lerp_color
 
 def dfs_steps(graph, start_id):
-    start = graph.nodes[start_id]
+    all_nodes = list(graph.nodes.values())
+    if start_id in graph.nodes:
+        start_node = graph.nodes[start_id]
+        all_nodes.remove(start_node)
+        all_nodes.insert(0, start_node)
 
-    stack = [(start, 0)]
-    graph.fx["stack"] = [n.id for (n, _) in stack]
-    graph.fx["log"].append(start.id)
+    amber = (255, 215, 0); green = (120, 200, 120)
 
-    amber = (255,215,0); green = (120,200,120)
+    for root_node in all_nodes:
+        if root_node.state != "unvisited":
+            continue
 
-    start.state = "visiting"
-    def tint_start(p):
-        start.tint = lerp_color((180,180,180), amber, ease_out_cubic(p))
-    yield from animate(graph, 0.20, tint_start)
-    start.tint = None
-    yield
+        stack = [(root_node, 0)]
+        root_node.state = "visiting"
+        graph.fx["log"].append(f"Start Component: {root_node.id}")
+        
+        yield from animate(graph, 0.70, lambda p: None)
 
-    while stack:
-        node, i = stack[-1]
-        graph.fx["stack"] = [n.id for (n, _) in stack]
+        while stack:
+            node, i = stack[-1]
+            graph.fx["stack"] = [n.id for (n, _) in stack]
 
-        if i < len(node.neighbors):
-            nxt = node.neighbors[i]
-            stack[-1] = (node, i + 1)
+            if i < len(node.neighbors):
+                nxt = node.neighbors[i]
+                stack[-1] = (node, i + 1)
 
-            if nxt.state == "unvisited":
-                graph.fx["cursor"] = (node.x, node.y)
-                def move(p):
-                    p2 = ease_out_cubic(p)
-                    graph.fx["cursor"] = (lerp(node.x, nxt.x, p2),
-                                          lerp(node.y, nxt.y, p2))
-                yield from animate(graph, 0.30, move)
-                graph.fx.pop("cursor", None)
+                if nxt.state == "unvisited":
+                    graph.fx["cursor"] = (node.x, node.y)
+                    yield from animate(graph, 0.80, lambda p: graph.fx.update({
+                        "cursor": (lerp(node.x, nxt.x, ease_out_cubic(p)), 
+                                   lerp(node.y, nxt.y, ease_out_cubic(p)))
+                    }))
+                    graph.fx.pop("cursor", None)
 
-                nxt.parent = node
-                nxt.state = "visiting"
-                graph.fx["log"].append(nxt.id)
-
-                def tint_nxt(p):
-                    nxt.tint = lerp_color((180,180,180), amber, ease_out_cubic(p))
-                yield from animate(graph, 0.15, tint_nxt)
-                nxt.tint = None
-
-                stack.append((nxt, 0))
+                    nxt.parent = node
+                    nxt.state = "visiting"
+                    graph.fx["log"].append(nxt.id)
+                    stack.append((nxt, 0))
+                    yield
+            else:
+                u, _ = stack.pop()
+                yield from animate(graph, 0.40, lambda p: None)
+                u.state = "visited"
                 graph.fx["stack"] = [n.id for (n, _) in stack]
                 yield
-        else:
-            u, _ = stack.pop()
-            def finish_node(p):
-                u.tint = lerp_color(amber, green, ease_out_cubic(p))
-            yield from animate(graph, 0.20, finish_node)
-            u.state = "visited"
-            u.tint = None
-            graph.fx["stack"] = [n.id for (n, _) in stack]
-            yield
