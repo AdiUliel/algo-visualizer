@@ -6,7 +6,7 @@ class Graph:
         self.nodes = {}         # id -> Node
         self.edges = []         # list of  Edge
         self.directed = directed
-        self.fx = {}            # transient visual effects/state, e.g. {'cursor': (x,y), 'queue': [ids]}
+        self.fx = {}
         self.speed_factor = 0.5
         
     def add_node(self, id, x, y):
@@ -37,5 +37,5 @@ class Graph:
         for node in self.nodes.values():
             node.state = "unvisited"
             node.parent = None
-            node.tint = None     # <- clear any custom color
-        self.fx.clear()          # <- clear transient effects
+            node.tint = None
+        self.fx.clear()

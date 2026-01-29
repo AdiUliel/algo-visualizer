@@ -6,7 +6,6 @@ from tkinter import ttk, filedialog, messagebox
 from src.infrastructure.graph import Graph
 from src.main import run_visualizer
 
-# ---------- Graph helpers ----------
 def build_demo_graph() -> Graph:
     g = Graph(directed=False)
     g.add_node(1, 140, 100)
@@ -40,7 +39,7 @@ def load_graph_from_json(path: str) -> Graph:
 
     return g
 
-# ---------- Tkinter UI ----------
+# Tkinter UI
 class PickerApp(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -124,7 +123,7 @@ class PickerApp(tk.Tk):
         # Launch the visualizer (fixed speed is set inside run_visualizer or Graph)
         run_visualizer(algorithm=algo, start_id=start_id, auto_play_start=autoplay, graph=g)
 
-# ---------- Entrypoint ----------
+# Entrypoint 
 if __name__ == "__main__":
     # Show the picker; visualizer launches after clicking Start
     app = PickerApp()

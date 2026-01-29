@@ -27,13 +27,11 @@ def draw_node(screen, node, font):
     screen.blit(label, rect)
 
 def draw_fx(screen, graph):
-    # moving cursor along an edge
     if "cursor" in graph.fx:
         x, y = graph.fx["cursor"]
         pygame.draw.circle(screen, (50, 120, 255), (int(x), int(y)), 6)
 
 def draw_sidebar(screen, graph, font):
-    # Right side panel for queue/stack
     panel_w, pad = 180, 8
     x0 = screen.get_width() - panel_w
     pygame.draw.rect(screen, (235, 235, 235), (x0, 0, panel_w, screen.get_height()))

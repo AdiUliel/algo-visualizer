@@ -6,7 +6,6 @@ from src.visualizer import draw_graph
 from src.algorithms.bfs import bfs_steps
 from src.algorithms.dfs import dfs_steps
 
-# ---- Pygame bootstrap (window, fonts) ----
 pygame.init()
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -35,7 +34,6 @@ def run_visualizer(algorithm: str = "bfs", start_id: int = 1, auto_play_start: b
     - auto_play_start: start in autoplay mode or not
     - graph: optional Graph object; if None, a small demo graph is created
     """
-    # ---- Graph setup ----
     g = graph if graph is not None else Graph(directed=False)
     if graph is None:
         g.add_node(1, 140, 100)
@@ -45,10 +43,8 @@ def run_visualizer(algorithm: str = "bfs", start_id: int = 1, auto_play_start: b
         g.add_edge(2, 3)
         g.add_edge(1, 3)
 
-    # Fix animation speed at x0.4
     g.speed_factor = 0.4
 
-    # ---- Algorithm stepper + control flags ----
     stepper = None
     auto_play = auto_play_start
 
@@ -71,7 +67,6 @@ def run_visualizer(algorithm: str = "bfs", start_id: int = 1, auto_play_start: b
         except StopIteration:
             stepper = None
 
-    # Prime the chosen algorithm once (so a picker can launch directly)
     if algorithm.lower() == "bfs":
         stepper = bfs_steps(g, start_id)
     elif algorithm.lower() == "dfs":
@@ -79,7 +74,7 @@ def run_visualizer(algorithm: str = "bfs", start_id: int = 1, auto_play_start: b
     else:
         raise ValueError(f"Unknown algorithm: {algorithm}")
 
-    # ---- Main loop ----
+    # Main loop
     running = True
     while running:
         for event in pygame.event.get():
@@ -111,6 +106,5 @@ def run_visualizer(algorithm: str = "bfs", start_id: int = 1, auto_play_start: b
     pygame.quit()
     sys.exit()
 
-# When run directly: default demo
 if __name__ == "__main__":
     run_visualizer(algorithm="bfs", start_id=1, auto_play_start=False)

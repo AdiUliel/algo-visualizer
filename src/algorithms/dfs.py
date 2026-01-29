@@ -4,7 +4,7 @@ def dfs_steps(graph, start_id):
     graph.reset_states()
     start = graph.nodes[start_id]
 
-    stack = [(start, 0)]   # (node, next-neighbor-index)
+    stack = [(start, 0)]
     graph.fx["stack"] = [n.id for (n, _) in stack]
 
     amber = (255,215,0); green = (120,200,120)
@@ -25,7 +25,6 @@ def dfs_steps(graph, start_id):
             stack[-1] = (node, i + 1)
 
             if nxt.state == "unvisited":
-                # cursor move node -> nxt
                 graph.fx["cursor"] = (node.x, node.y)
                 def move(p):
                     p2 = ease_out_cubic(p)
@@ -45,7 +44,6 @@ def dfs_steps(graph, start_id):
                 graph.fx["stack"] = [n.id for (n, _) in stack]
                 yield
         else:
-            # finish node
             def finish_node(p):
                 node.tint = lerp_color(amber, green, ease_out_cubic(p))
             yield from animate(graph, 0.20, finish_node)

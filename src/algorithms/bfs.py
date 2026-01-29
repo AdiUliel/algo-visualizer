@@ -7,9 +7,8 @@ def bfs_steps(graph, start_id):
     start = graph.nodes[start_id]
 
     q = deque([start])
-    graph.fx["queue"] = [start.id]  # show in sidebar
+    graph.fx["queue"] = [start.id]
 
-    # highlight start: gray -> amber
     start.state = "visiting"
     start_base = (180,180,180)
     amber = (255,215,0)
@@ -21,13 +20,10 @@ def bfs_steps(graph, start_id):
 
     while q:
         u = q.popleft()
-        # update queue panel
         graph.fx["queue"] = [n.id for n in q]
 
-        # visit neighbors
         for v in u.neighbors:
             if v.state == "unvisited":
-                # animate cursor moving u -> v
                 graph.fx["cursor"] = (u.x, u.y)
                 ux, uy, vx, vy = u.x, u.y, v.x, v.y
                 def move(p):
@@ -36,7 +32,6 @@ def bfs_steps(graph, start_id):
                 yield from animate(graph, 0.30, move)
                 graph.fx.pop("cursor", None)
 
-                # discovery fade: gray -> amber
                 v.state = "visiting"
                 def tint_v(p):
                     v.tint = lerp_color((180,180,180), amber, ease_out_cubic(p))
@@ -46,9 +41,8 @@ def bfs_steps(graph, start_id):
                 v.parent = u
                 q.append(v)
                 graph.fx["queue"] = [n.id for n in q]
-                yield  # show enqueue result
+                yield
 
-        # finish u: amber -> green
         green = (120,200,120)
         def finish_u(p):
             u.tint = lerp_color(amber, green, ease_out_cubic(p))
