@@ -42,7 +42,7 @@ algo-visualizer/
 ## How to Run
 1. Clone the repo
 ```text
-git clone https://github.com/<your-username>/algo-visualizer.git
+git clone https://github.com/adiuliel/algo-visualizer.git
 cd algo-visualizer
 ```
 2. Install the requirements:
