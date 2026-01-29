@@ -1,9 +1,7 @@
 from collections import deque
 from .animation_helpers import animate, ease_out_cubic, lerp, lerp_color
 
-
 def bfs_steps(graph, start_id):
-    graph.reset_states()
     start = graph.nodes[start_id]
 
     q = deque([start])
@@ -20,6 +18,7 @@ def bfs_steps(graph, start_id):
 
     while q:
         u = q.popleft()
+        graph.fx["log"].append(u.id)
         graph.fx["queue"] = [n.id for n in q]
 
         for v in u.neighbors:

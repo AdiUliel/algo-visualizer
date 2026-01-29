@@ -2,7 +2,6 @@ import pygame
 
 RADIUS = 18
 EDGE_WIDTH = 2
-
 COLORS = {
     "unvisited": (180, 180, 180),
     "visiting":  (255, 215, 0),
@@ -11,11 +10,16 @@ COLORS = {
 EDGE_COLOR   = (60, 60, 60)
 TEXT_COLOR   = (30, 30, 30)
 OUTLINE_COLOR= (30, 30, 30)
+WEIGHT_COLOR = (200, 0, 0)
+HIGHLIGHT_TEXT = (0, 102, 204)
 
-def draw_edge(screen, edge):
-    pygame.draw.line(screen, EDGE_COLOR,
-                     (edge.start.x, edge.start.y),
-                     (edge.end.x,   edge.end.y), EDGE_WIDTH)
+def draw_edge(screen, edge, font, show_weights=True):
+    pygame.draw.line(screen, EDGE_COLOR, (edge.start.x, edge.start.y), (edge.end.x, edge.end.y), EDGE_WIDTH)
+    if show_weights:
+        mid_x = (edge.start.x + edge.end.x) / 2
+        mid_y = (edge.start.y + edge.end.y) / 2
+        weight_surf = font.render(str(edge.weight), True, WEIGHT_COLOR)
+        screen.blit(weight_surf, (mid_x, mid_y))
 
 def draw_node(screen, node, font):
     base = COLORS.get(node.state, COLORS["unvisited"])
@@ -26,30 +30,46 @@ def draw_node(screen, node, font):
     rect = label.get_rect(center=(node.x, node.y))
     screen.blit(label, rect)
 
-def draw_fx(screen, graph):
-    if "cursor" in graph.fx:
-        x, y = graph.fx["cursor"]
-        pygame.draw.circle(screen, (50, 120, 255), (int(x), int(y)), 6)
-
 def draw_sidebar(screen, graph, font):
     panel_w, pad = 180, 8
     x0 = screen.get_width() - panel_w
     pygame.draw.rect(screen, (235, 235, 235), (x0, 0, panel_w, screen.get_height()))
-    title = "Queue (BFS)" if "queue" in graph.fx else ("Stack (DFS)" if "stack" in graph.fx else "")
-    if title:
-        t = font.render(title, True, (40,40,40))
-        screen.blit(t, (x0 + pad, 8))
-    items = graph.fx.get("queue", graph.fx.get("stack", []))
-    y = 30
-    for nid in items:
-        s = font.render(str(nid), True, (60,60,60))
-        screen.blit(s, (x0 + pad, y))
-        y += 20
+    
+    mode = graph.fx.get("mode", "Ready")
+    mode_surf = font.render(f"MODE: {mode}", True, HIGHLIGHT_TEXT)
+    screen.blit(mode_surf, (x0 + pad, 10))
+
+    data_title = "Queue/PQ:" if "queue" in graph.fx else ("Stack:" if "stack" in graph.fx else "")
+    if data_title:
+        screen.blit(font.render(data_title, True, (40, 40, 40)), (x0 + pad, 40))
+        items = graph.fx.get("queue", graph.fx.get("stack", []))
+        y = 60
+        for item in items[:8]:
+            screen.blit(font.render(str(item), True, (60, 60, 60)), (x0 + pad, y))
+            y += 18
+
+    log = graph.fx.get("log", [])
+    if log:
+        ly = 250
+        screen.blit(font.render("Visit Log:", True, (40, 40, 40)), (x0 + pad, ly))
+        y_offset = ly + 22
+        for entry in log[-10:]:
+            log_surf = font.render(f"• {entry}", True, (100, 100, 100))
+            screen.blit(log_surf, (x0 + pad, y_offset))
+            y_offset += 18
 
 def draw_graph(screen, graph, font):
+    mode = graph.fx.get("mode", "Ready")
+    is_dijkstra = "Dijkstra" in mode
+    is_ready = mode == "Ready"
+    
+    show_weights = is_dijkstra or is_ready
+
     for e in graph.edges:
-        draw_edge(screen, e)
+        draw_edge(screen, e, font, show_weights)
     for node in graph.nodes.values():
         draw_node(screen, node, font)
-    draw_fx(screen, graph)
+    if "cursor" in graph.fx:
+        x, y = graph.fx["cursor"]
+        pygame.draw.circle(screen, (50, 120, 255), (int(x), int(y)), 6)
     draw_sidebar(screen, graph, font)

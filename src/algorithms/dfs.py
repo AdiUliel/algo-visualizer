@@ -1,11 +1,11 @@
-from.animation_helpers import animate, ease_out_cubic, lerp, lerp_color
+from .animation_helpers import animate, ease_out_cubic, lerp, lerp_color
 
 def dfs_steps(graph, start_id):
-    graph.reset_states()
     start = graph.nodes[start_id]
 
     stack = [(start, 0)]
     graph.fx["stack"] = [n.id for (n, _) in stack]
+    graph.fx["log"].append(start.id)
 
     amber = (255,215,0); green = (120,200,120)
 
@@ -35,6 +35,8 @@ def dfs_steps(graph, start_id):
 
                 nxt.parent = node
                 nxt.state = "visiting"
+                graph.fx["log"].append(nxt.id)
+
                 def tint_nxt(p):
                     nxt.tint = lerp_color((180,180,180), amber, ease_out_cubic(p))
                 yield from animate(graph, 0.15, tint_nxt)
@@ -44,11 +46,11 @@ def dfs_steps(graph, start_id):
                 graph.fx["stack"] = [n.id for (n, _) in stack]
                 yield
         else:
+            u, _ = stack.pop()
             def finish_node(p):
-                node.tint = lerp_color(amber, green, ease_out_cubic(p))
+                u.tint = lerp_color(amber, green, ease_out_cubic(p))
             yield from animate(graph, 0.20, finish_node)
-            node.state = "visited"
-            node.tint = None
-            stack.pop()
+            u.state = "visited"
+            u.tint = None
             graph.fx["stack"] = [n.id for (n, _) in stack]
             yield

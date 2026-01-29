@@ -50,13 +50,13 @@ algo-visualizer/
         python -m src.main
 
 ## Controls
-    Key 	    Action
-    B   	    Start BFS
-    D	        Start DFS
-    Space       Execute one step
-    P	        Toggle autoplay
-    R   	    Reset graph state
-    ESC/Q	    Quit
+    Key 	        Action
+    B   	        Start BFS
+    D	            Start DFS
+    Space           Execute one step
+    P	            Toggle autoplay
+    R   	        Reset graph state
+    ESC/Q	        Quit
 
 ## Custom Graph
 You can load your own graph by filling the following JSON format.

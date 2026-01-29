@@ -1,10 +1,11 @@
 import sys
 import pygame
 
-from src.infrastructure.graph import Graph
+from src.infrastructure.graph import Graph, build_demo_graph
 from src.visualizer import draw_graph
 from src.algorithms.bfs import bfs_steps
 from src.algorithms.dfs import dfs_steps
+from src.algorithms.dijkstra import dijkstra_steps
 
 pygame.init()
 WIDTH, HEIGHT = 800, 600
@@ -16,7 +17,7 @@ help_font = pygame.font.SysFont(None, 18)
 
 def draw_help(screen):
     lines = [
-        "B: start BFS   D: start DFS",
+        "B: BFS   D: DFS   K: Dijkstra",
         "SPACE: step    P: autoplay on/off",
         "R: reset       ESC/Q: quit",
     ]
@@ -27,35 +28,33 @@ def draw_help(screen):
         y += 18
 
 def run_visualizer(algorithm: str = "bfs", start_id: int = 1, auto_play_start: bool = False, graph: Graph | None = None):
-    """
-    Launch the Pygame visualizer.
-    - algorithm: 'bfs' or 'dfs'
-    - start_id:  node id to start from
-    - auto_play_start: start in autoplay mode or not
-    - graph: optional Graph object; if None, a small demo graph is created
-    """
-    g = graph if graph is not None else Graph(directed=False)
-    if graph is None:
-        g.add_node(1, 140, 100)
-        g.add_node(2, 300, 200)
-        g.add_node(3, 140, 320)
-        g.add_edge(1, 2)
-        g.add_edge(2, 3)
-        g.add_edge(1, 3)
-
+    g = graph if graph is not None else build_demo_graph()
     g.speed_factor = 0.4
-
     stepper = None
     auto_play = auto_play_start
 
-    def start_bfs(start_id_local=1):
+    def start_bfs(sid):
         nonlocal stepper, auto_play
-        stepper = bfs_steps(g, start_id_local)
+        g.reset_states()      
+        g.fx["log"] = []      
+        stepper = bfs_steps(g, sid)
+        g.fx["mode"] = "BFS"  
         auto_play = False
 
-    def start_dfs(start_id_local=1):
+    def start_dfs(sid):
         nonlocal stepper, auto_play
-        stepper = dfs_steps(g, start_id_local)
+        g.reset_states()
+        g.fx["log"] = []
+        stepper = dfs_steps(g, sid)
+        g.fx["mode"] = "DFS"
+        auto_play = False
+
+    def start_dijkstra(sid):
+        nonlocal stepper, auto_play
+        g.reset_states()
+        g.fx["log"] = []
+        stepper = dijkstra_steps(g, sid)
+        g.fx["mode"] = "Dijkstra"
         auto_play = False
 
     def step_once():
@@ -65,16 +64,15 @@ def run_visualizer(algorithm: str = "bfs", start_id: int = 1, auto_play_start: b
         try:
             next(stepper)
         except StopIteration:
+            old_mode = g.fx.get("mode", "")
+            if "(Done)" not in old_mode:
+                g.fx["mode"] = f"{old_mode} (Done)"
             stepper = None
 
-    if algorithm.lower() == "bfs":
-        stepper = bfs_steps(g, start_id)
-    elif algorithm.lower() == "dfs":
-        stepper = dfs_steps(g, start_id)
-    else:
-        raise ValueError(f"Unknown algorithm: {algorithm}")
+    if algorithm.lower() == "bfs": start_bfs(start_id)
+    elif algorithm.lower() == "dfs": start_dfs(start_id)
+    elif algorithm.lower() == "dijkstra": start_dijkstra(start_id)
 
-    # Main loop
     running = True
     while running:
         for event in pygame.event.get():
@@ -85,12 +83,17 @@ def run_visualizer(algorithm: str = "bfs", start_id: int = 1, auto_play_start: b
                     start_bfs(start_id)
                 elif event.key == pygame.K_d:
                     start_dfs(start_id)
+                elif event.key == pygame.K_k:
+                    start_dijkstra(start_id)
                 elif event.key == pygame.K_SPACE:
                     step_once()
                 elif event.key == pygame.K_p:
                     auto_play = not auto_play
                 elif event.key == pygame.K_r:
                     g.reset_states()
+                    g.fx["mode"] = "Ready"
+                    stepper = None 
+                    auto_play = False
                 elif event.key in (pygame.K_ESCAPE, pygame.K_q):
                     running = False
 
@@ -107,4 +110,4 @@ def run_visualizer(algorithm: str = "bfs", start_id: int = 1, auto_play_start: b
     sys.exit()
 
 if __name__ == "__main__":
-    run_visualizer(algorithm="bfs", start_id=1, auto_play_start=False)
+    run_visualizer()
