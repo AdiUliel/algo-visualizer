@@ -1,5 +1,3 @@
-<img width="1187" height="692" alt="_דיאגרמה ללא שם_ drawio (1)" src="https://github.com/user-attachments/assets/8dcc9778-5147-452a-a6ec-e54b05b23b07" />
-
 # Algorithm Visualizer
 An interactive tool for exploring algorithms visually.
 The visualizer allows you to easily build, edit, and traverse graphs. Currently supports BFS, DFS amd Dijkstra algorithms.
